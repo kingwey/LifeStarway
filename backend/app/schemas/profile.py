@@ -54,3 +54,12 @@ class ResumeImportRequest(BaseModel):
 class ResumeImportResponse(BaseModel):
     success: bool
     profile_data: ProfileCreate
+
+
+class LinkImportSource(BaseModel):
+    type: str
+    url: str
+
+
+class LinkImportRequest(BaseModel):
+    sources: List[LinkImportSource]

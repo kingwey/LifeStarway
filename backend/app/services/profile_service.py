@@ -36,25 +36,30 @@ async def create_or_update_profile(db: AsyncSession, user_id: str, data: Profile
 
 
 async def import_resume(db: AsyncSession, user_id: str, resume_text: str):
-    prompt = RESUME_PARSE_PROMPT.format(resume_text=resume_text[:2000])
-    raw_output = await call_llm(prompt)
-    parsed = parse_llm_resume(raw_output)
-    
-    profile_data = ProfileCreate(
-        birth_year=parsed.birth_year,
-        gender=parsed.gender,
-        education=parsed.education,
-        major=parsed.major,
-        school=parsed.school,
-        skills=parsed.skills,
-        personality_type=parsed.personality_type,
-        current_industry=parsed.current_industry,
-        current_role=parsed.current_role,
-        work_years=parsed.work_years,
-        salary_range=parsed.salary_range,
-        career_history=parsed.career_history,
-        resume_text=resume_text
-    )
+    try:
+        prompt = RESUME_PARSE_PROMPT.format(resume_text=resume_text[:2000])
+        raw_output = await call_llm(prompt)
+        parsed = parse_llm_resume(raw_output)
+        
+        profile_data = ProfileCreate(
+            birth_year=parsed.birth_year,
+            gender=parsed.gender,
+            education=parsed.education,
+            major=parsed.major,
+            school=parsed.school,
+            skills=parsed.skills,
+            personality_type=parsed.personality_type,
+            current_industry=parsed.current_industry,
+            current_role=parsed.current_role,
+            work_years=parsed.work_years,
+            salary_range=parsed.salary_range,
+            career_history=parsed.career_history,
+            resume_text=resume_text
+        )
+    except Exception as e:
+        logger = __import__('logging').getLogger('lifestarway.profile')
+        logger.warning(f"LLM解析失败，返回原始数据: {e}")
+        profile_data = ProfileCreate(resume_text=resume_text)
     
     profile = await create_or_update_profile(db, user_id, profile_data)
     return profile_data

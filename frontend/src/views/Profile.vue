@@ -150,7 +150,7 @@
         <div class="mt-8 pt-6 border-t border-white/10">
           <h3 class="text-lg font-semibold mb-4">快速导入</h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
               <h4 class="text-sm font-medium mb-2">上传简历文件</h4>
               <el-upload
@@ -185,6 +185,24 @@
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" :loading="resumeLoading" @click="handleImport">AI解析导入</el-button>
+                </el-form-item>
+              </el-form>
+            </div>
+            
+            <div>
+              <h4 class="text-sm font-medium mb-2">链接一键导入</h4>
+              <el-form :model="linkForm">
+                <el-form-item>
+                  <el-input v-model="linkForm.githubUrl" placeholder="GitHub 链接" size="small" />
+                </el-form-item>
+                <el-form-item>
+                  <el-input v-model="linkForm.linkedinUrl" placeholder="LinkedIn 链接" size="small" />
+                </el-form-item>
+                <el-form-item>
+                  <el-input v-model="linkForm.blogUrl" placeholder="博客/技术社区链接" size="small" />
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" :loading="linkLoading" @click="handleLinkImport">一键导入</el-button>
                 </el-form-item>
               </el-form>
             </div>
@@ -242,6 +260,12 @@ const activeStep = ref(0)
 const versions = ref([])
 const compareLeft = ref(null)
 const compareRight = ref(null)
+const linkLoading = ref(false)
+const linkForm = reactive({
+  githubUrl: '',
+  linkedinUrl: '',
+  blogUrl: '',
+})
 
 const FIELD_LABELS = {
   birth_year: '出生年份',
@@ -386,6 +410,35 @@ const applyProfileData = (data) => {
   if (data.work_years !== null) form.work_years = data.work_years
   if (data.salary_range) form.salary_range = data.salary_range
   if (data.career_history?.length) form.career_history = data.career_history
+}
+
+const handleLinkImport = async () => {
+  const sources = []
+  if (linkForm.githubUrl.trim()) {
+    sources.push({ type: 'github', url: linkForm.githubUrl.trim() })
+  }
+  if (linkForm.linkedinUrl.trim()) {
+    sources.push({ type: 'linkedin', url: linkForm.linkedinUrl.trim() })
+  }
+  if (linkForm.blogUrl.trim()) {
+    sources.push({ type: 'blog', url: linkForm.blogUrl.trim() })
+  }
+  
+  if (sources.length === 0) {
+    ElMessage.warning('请至少填写一个链接')
+    return
+  }
+  
+  linkLoading.value = true
+  try {
+    const response = await profileApi.importLinks({ sources })
+    applyProfileData(response.data.profile_data)
+    ElMessage.success('链接导入成功，请核对并保存')
+  } catch (error) {
+    ElMessage.error(error.response?.data?.detail || '导入失败')
+  } finally {
+    linkLoading.value = false
+  }
 }
 
 onMounted(async () => {

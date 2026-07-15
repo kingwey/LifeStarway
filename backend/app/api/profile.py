@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.user import User
-from app.schemas.profile import ProfileCreate, ProfileResponse, ResumeImportRequest, ResumeImportResponse
-from app.services import get_profile, create_or_update_profile, import_resume, get_profile_versions
+from app.schemas.profile import ProfileCreate, ProfileResponse, ResumeImportRequest, ResumeImportResponse, LinkImportRequest
+from app.services import get_profile, create_or_update_profile, import_resume, get_profile_versions, import_from_public_sources
 from app.utils.deps import get_current_user
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
@@ -93,3 +93,17 @@ async def extract_text(content: bytes, ext: str) -> str:
 async def get_profile_version_history(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     versions = await get_profile_versions(db, str(user.id))
     return versions
+
+
+@router.post("/import-links", response_model=ResumeImportResponse)
+async def import_from_links(
+    request: LinkImportRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    if not request.sources:
+        raise HTTPException(status_code=400, detail="请至少提供一个链接来源")
+    
+    raw_text = await import_from_public_sources(request.sources)
+    profile_data = await import_resume(db, str(user.id), raw_text)
+    return {"success": True, "profile_data": profile_data}

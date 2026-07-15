@@ -21,15 +21,27 @@
         
         <el-form :model="form" :rules="rules" ref="formRef" class="space-y-4">
           <el-form-item prop="email">
-            <el-input v-model="form.email" placeholder="邮箱" prefix-icon="📧"></el-input>
+            <el-input v-model="form.email" placeholder="邮箱">
+              <template #prefix>
+                <span class="text-lg">📧</span>
+              </template>
+            </el-input>
           </el-form-item>
           
           <el-form-item prop="password">
-            <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="🔒"></el-input>
+            <el-input v-model="form.password" type="password" placeholder="密码">
+              <template #prefix>
+                <span class="text-lg">🔒</span>
+              </template>
+            </el-input>
           </el-form-item>
           
           <el-form-item v-if="activeTab === 'register'" prop="nickname">
-            <el-input v-model="form.nickname" placeholder="昵称" prefix-icon="👤"></el-input>
+            <el-input v-model="form.nickname" placeholder="昵称">
+              <template #prefix>
+                <span class="text-lg">👤</span>
+              </template>
+            </el-input>
           </el-form-item>
           
           <el-form-item>

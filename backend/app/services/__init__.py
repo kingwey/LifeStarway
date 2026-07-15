@@ -3,3 +3,4 @@ from app.services.profile_service import get_profile, create_or_update_profile, 
 from app.services.plan_service import create_diagnosis, get_latest_diagnosis, get_diagnoses, generate_plan, get_plans, get_plan
 from app.services.starmap_service import get_starmap_data
 from app.services.whatif_service import create_simulation, get_simulation, get_simulations
+from app.services.scraper_service import import_from_public_sources

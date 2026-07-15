@@ -1,17 +1,18 @@
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import settings
 
-if settings.DATABASE_URL.startswith("sqlite"):
-    engine = create_async_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False},
-        echo=False
-    )
+is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+
+engine_kwargs = {"echo": False}
+if is_sqlite:
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
 else:
-    engine = create_async_engine(settings.DATABASE_URL, echo=False)
+    engine_kwargs["pool_size"] = 20
+    engine_kwargs["max_overflow"] = 10
+
+engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
 
 AsyncSessionLocal = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False

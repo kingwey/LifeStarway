@@ -17,5 +17,4 @@ class SimulationResponse(BaseModel):
     comparison: dict = Field(default_factory=dict)
     created_at: str
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}

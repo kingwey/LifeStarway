@@ -29,5 +29,4 @@ class PlanResponse(BaseModel):
     alternative_paths: List[dict] = Field(default_factory=list)
     created_at: str
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}

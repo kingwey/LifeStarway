@@ -64,6 +64,13 @@ async def get_latest_diagnosis(db: AsyncSession, user_id: str):
     return result.scalar_one_or_none()
 
 
+async def get_diagnoses(db: AsyncSession, user_id: str):
+    result = await db.execute(
+        select(Diagnosis).where(Diagnosis.user_id == user_id).order_by(Diagnosis.created_at.desc())
+    )
+    return result.scalars().all()
+
+
 async def generate_plan(db: AsyncSession, user_id: str, plan_type: str, diagnosis_id: str = None):
     if plan_type not in PLAN_TYPE_DESCS:
         raise HTTPException(status_code=400, detail="无效的规划类型")

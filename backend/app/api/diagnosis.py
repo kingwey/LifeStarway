@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.schemas.diagnosis import DiagnosisResponse, DiagnosisCreate
-from app.services import create_diagnosis, get_latest_diagnosis
+from app.services import create_diagnosis, get_latest_diagnosis, get_diagnoses
 from app.utils.deps import get_current_user
 
 router = APIRouter(prefix="/diagnoses", tags=["diagnoses"])
@@ -25,3 +25,9 @@ async def create_diagnosis_api(
 async def get_latest_diagnosis_api(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     diagnosis = await get_latest_diagnosis(db, str(user.id))
     return diagnosis
+
+
+@router.get("", response_model=list[DiagnosisResponse])
+async def get_diagnoses_api(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    diagnoses = await get_diagnoses(db, str(user.id))
+    return diagnoses

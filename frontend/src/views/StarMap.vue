@@ -13,26 +13,46 @@
         </div>
         
         <div v-else-if="data.nodes.length" class="relative">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-star-cyan"></span>
+                <span class="text-sm text-white/60">短期目标</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-star-primary"></span>
+                <span class="text-sm text-white/60">中期目标</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-star-pink"></span>
+                <span class="text-sm text-white/60">长期目标</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <el-button size="small" @click="playAnimation">🎬 播放路径动画</el-button>
+              <el-button size="small" @click="resetView">🔄 重置视图</el-button>
+              <el-switch v-model="draggable" active-text="可拖拽" inactive-text="固定" />
+            </div>
+          </div>
+          
           <div ref="chartRef" class="w-full h-[600px]"></div>
           
-          <div class="mt-6 flex items-center justify-center gap-8">
-            <div class="flex items-center gap-2">
-              <span class="w-4 h-4 rounded-full bg-star-cyan"></span>
-              <span class="text-sm text-white/60">短期目标</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-4 h-4 rounded-full bg-star-primary"></span>
-              <span class="text-sm text-white/60">中期目标</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-4 h-4 rounded-full bg-star-pink"></span>
-              <span class="text-sm text-white/60">长期目标</span>
+          <div v-if="selectedNode" class="mt-4 p-4 bg-white/5 rounded-lg">
+            <div class="flex items-start justify-between">
+              <div>
+                <h4 class="font-medium">{{ selectedNode.name }}</h4>
+                <p class="text-sm text-white/60 mt-1">概率：{{ Math.round(selectedNode.probability * 100) }}%</p>
+                <p class="text-sm text-white/60">类别：{{ selectedNode.category }}</p>
+                <p v-if="selectedNode.metrics?.target_role" class="text-sm text-white/60">目标职位：{{ selectedNode.metrics.target_role }}</p>
+                <p v-if="selectedNode.metrics?.target_salary" class="text-sm text-white/60">目标薪资：{{ selectedNode.metrics.target_salary }}</p>
+              </div>
+              <el-button size="small" @click="selectedNode = null">关闭</el-button>
             </div>
           </div>
           
           <div class="mt-4 p-4 bg-white/5 rounded-lg">
             <h4 class="text-sm font-medium mb-2">图例说明</h4>
-            <p class="text-xs text-white/60">节点大小代表重要性，亮度代表达成概率；实线为主推荐路径，虚线为备选路径</p>
+            <p class="text-xs text-white/60">节点大小代表重要性，亮度代表达成概率；实线为主推荐路径，虚线为备选路径。点击节点查看详情，开启拖拽可自由调整星图布局。</p>
           </div>
         </div>
         
@@ -56,7 +76,10 @@ import { starmapApi } from '../api'
 const chartRef = ref(null)
 const loading = ref(false)
 const data = ref({ nodes: [], edges: [] })
+const draggable = ref(false)
+const selectedNode = ref(null)
 let chart = null
+let animationInterval = null
 
 const colorMap = {
   short_term: '#a8edea',
@@ -70,6 +93,7 @@ const colorMap = {
 const initChart = () => {
   if (!chartRef.value) return
   
+  chart?.dispose()
   chart = echarts.init(chartRef.value)
   
   const option = {
@@ -97,10 +121,11 @@ const initChart = () => {
       layout: 'none',
       coordinateSystem: undefined,
       roam: true,
-      draggable: false,
+      draggable: draggable.value,
       emphasis: {
         focus: 'adjacency',
-        lineStyle: { width: 4 }
+        lineStyle: { width: 4 },
+        itemStyle: { shadowBlur: 40 }
       },
       data: data.value.nodes.map(node => ({
         id: node.id,
@@ -134,7 +159,8 @@ const initChart = () => {
           color: edge.path_type === 'main' ? '#667eea' : '#a8edea',
           width: edge.path_type === 'main' ? 3 : 1,
           type: edge.path_type === 'main' ? 'solid' : 'dashed',
-          opacity: 0.6
+          opacity: 0.6,
+          curveness: 0.1
         }
       })),
       animationDuration: 1500,
@@ -143,6 +169,57 @@ const initChart = () => {
   }
   
   chart.setOption(option)
+  
+  chart.on('click', (params) => {
+    if (params.dataType === 'node') {
+      selectedNode.value = params.data
+    }
+  })
+  
+  chart.on('mouseout', () => {
+    if (chart) {
+      chart.dispatchAction({ type: 'downplay' })
+    }
+  })
+}
+
+const playAnimation = () => {
+  if (!chart || !data.value.edges.length) return
+  
+  const mainEdges = data.value.edges.filter(e => e.path_type === 'main')
+  let currentIndex = 0
+  
+  if (animationInterval) clearInterval(animationInterval)
+  
+  animationInterval = setInterval(() => {
+    if (currentIndex >= mainEdges.length) {
+      clearInterval(animationInterval)
+      chart.dispatchAction({ type: 'highlight', seriesIndex: 0 })
+      return
+    }
+    
+    const edge = mainEdges[currentIndex]
+    chart.dispatchAction({
+      type: 'highlight',
+      seriesIndex: 0,
+      dataIndex: data.value.nodes.findIndex(n => n.id === edge.source)
+    })
+    chart.dispatchAction({
+      type: 'highlight',
+      seriesIndex: 0,
+      dataIndex: data.value.nodes.findIndex(n => n.id === edge.target)
+    })
+    
+    currentIndex++
+  }, 800)
+}
+
+const resetView = () => {
+  if (chart) {
+    chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+    chart.dispatchAction({ type: 'downplay', seriesIndex: 0 })
+  }
+  selectedNode.value = null
 }
 
 const fetchData = async () => {
@@ -168,6 +245,11 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   chart?.dispose()
+  if (animationInterval) clearInterval(animationInterval)
+})
+
+watch(draggable, () => {
+  initChart()
 })
 
 watch(() => data.value.nodes.length, () => {

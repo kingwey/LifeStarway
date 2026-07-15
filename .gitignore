@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Environment variables - 永远不要提交真实密钥
+.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node
+node_modules/
+dist/
+*.local
+
+# Test reports
+test_report.json
+*.test-report
+
+# Temp scripts
+screenshot.py
+backend/screenshot.py

@@ -1,3 +1,5 @@
+from uuid import UUID
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
@@ -36,14 +38,13 @@ class ProfileUpdate(ProfileCreate):
 
 
 class ProfileResponse(ProfileCreate):
-    id: str
-    user_id: str
+    id: UUID
+    user_id: UUID
     version: int
-    created_at: str
-    updated_at: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class ResumeImportRequest(BaseModel):

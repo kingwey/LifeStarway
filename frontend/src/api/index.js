@@ -42,12 +42,21 @@ export const profileApi = {
   get: () => api.get('/profiles'),
   update: (data) => api.post('/profiles', data),
   importResume: (data) => api.post('/profiles/import-resume', data),
+  uploadResume: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/profiles/upload-resume', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000,
+    })
+  },
   versions: () => api.get('/profiles/versions'),
 }
 
 export const diagnosisApi = {
   create: (data) => api.post('/diagnoses', data),
   latest: () => api.get('/diagnoses/latest'),
+  list: () => api.get('/diagnoses'),
 }
 
 export const planApi = {

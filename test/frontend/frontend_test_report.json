@@ -1,0 +1,364 @@
+{
+  "date": "2026-07-15",
+  "total_tests": 89,
+  "passed": 89,
+  "failed": 0,
+  "results": [
+    {
+      "test": "authApi 模块已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "authApi.register 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "authApi.login 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "authApi.me 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "profileApi 模块已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "profileApi.get 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "profileApi.update 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "profileApi.importResume 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "profileApi.uploadResume 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "profileApi.versions 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "diagnosisApi 模块已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "diagnosisApi.create 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "diagnosisApi.latest 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "diagnosisApi.list 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "planApi 模块已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "planApi.generate 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "planApi.list 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "planApi.get 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "starmapApi 模块已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "starmapApi.get 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "simulationApi 模块已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "simulationApi.create 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "simulationApi.list 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "simulationApi.get 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "请求拦截器已配置",
+      "status": "PASS"
+    },
+    {
+      "test": "请求拦截器注入 Authorization 头",
+      "status": "PASS"
+    },
+    {
+      "test": "响应拦截器已配置",
+      "status": "PASS"
+    },
+    {
+      "test": "响应拦截器处理 401 状态码",
+      "status": "PASS"
+    },
+    {
+      "test": "401 时跳转登录页",
+      "status": "PASS"
+    },
+    {
+      "test": "文件上传使用 FormData",
+      "status": "PASS"
+    },
+    {
+      "test": "文件上传设置 multipart header",
+      "status": "PASS"
+    },
+    {
+      "test": "文件上传超时 120 秒",
+      "status": "PASS"
+    },
+    {
+      "test": "登录路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "首页路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "档案路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "诊断路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "规划路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "星图路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "WhatIf 路由已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "登录页无需认证",
+      "status": "PASS"
+    },
+    {
+      "test": "受保护页面需认证",
+      "status": "PASS"
+    },
+    {
+      "test": "全局路由守卫已配置",
+      "status": "PASS"
+    },
+    {
+      "test": "路由守卫检查登录状态",
+      "status": "PASS"
+    },
+    {
+      "test": "未登录时重定向到登录页",
+      "status": "PASS"
+    },
+    {
+      "test": "Pinia store 已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "token 从 localStorage 初始化",
+      "status": "PASS"
+    },
+    {
+      "test": "user 从 localStorage 初始化",
+      "status": "PASS"
+    },
+    {
+      "test": "isLoggedIn 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "login 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "register 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "fetchUser 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "fetchProfile 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "logout 方法已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "login 后持久化 token",
+      "status": "PASS"
+    },
+    {
+      "test": "logout 清除 token",
+      "status": "PASS"
+    },
+    {
+      "test": "logout 清除 user",
+      "status": "PASS"
+    },
+    {
+      "test": "开发代理已配置",
+      "status": "PASS"
+    },
+    {
+      "test": "API 路径代理已配置",
+      "status": "PASS"
+    },
+    {
+      "test": "代理目标为后端 8000 端口",
+      "status": "PASS"
+    },
+    {
+      "test": "Vue 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "Axios 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "Pinia 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "Vue Router 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "Element Plus 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "ECharts 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "TailwindCSS 依赖已声明",
+      "status": "PASS"
+    },
+    {
+      "test": "dev 脚本已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "build 脚本已定义",
+      "status": "PASS"
+    },
+    {
+      "test": "Login.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "Login.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Login.vue 包含 script 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Dashboard.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "Dashboard.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Dashboard.vue 包含 script 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Profile.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "Profile.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Profile.vue 包含 script 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Diagnosis.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "Diagnosis.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Diagnosis.vue 包含 script 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Plan.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "Plan.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "Plan.vue 包含 script 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "StarMap.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "StarMap.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "StarMap.vue 包含 script 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "WhatIf.vue 组件文件存在",
+      "status": "PASS"
+    },
+    {
+      "test": "WhatIf.vue 包含 template 标签",
+      "status": "PASS"
+    },
+    {
+      "test": "WhatIf.vue 包含 script 标签",
+      "status": "PASS"
+    }
+  ]
+}

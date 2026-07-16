@@ -11,7 +11,7 @@ class Plan(Base):
 
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     user_id = Column(GUID, ForeignKey("users.id"), nullable=False)
-    diagnosis_id = Column(GUID, ForeignKey("diagnoses.id"), nullable=False)
+    diagnosis_id = Column(GUID, ForeignKey("diagnoses.id", ondelete="CASCADE"), nullable=False)
     
     plan_type = Column(String(20), nullable=False)
     title = Column(String(200), nullable=False)

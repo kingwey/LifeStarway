@@ -11,9 +11,11 @@ from app.config import settings
 class ProfileScraper:
     """公开信息采集器"""
     
+    DEFAULT_USER_AGENT = "LifeStarway/1.0 (https://github.com/lifestarway/lifestarway)"
+    
     def __init__(self):
-        self.client = httpx.AsyncClient(timeout=15.0)
-        self.github_token = settings.GITHUB_TOKEN if hasattr(settings, 'GITHUB_TOKEN') else None
+        self.client = httpx.AsyncClient(timeout=15.0, headers={"User-Agent": self.DEFAULT_USER_AGENT})
+        self.github_token = settings.GITHUB_TOKEN
     
     async def fetch_github_profile(self, username: str) -> str:
         """从GitHub获取用户信息"""
@@ -44,12 +46,7 @@ class ProfileScraper:
         return resp.json()
     
     async def _analyze_languages(self, repos: List[Dict]) -> Dict[str, int]:
-        headers = {}
-        if self.github_token:
-            headers['Authorization'] = f'token {self.github_token}'
-        
         languages = {}
-        tasks = []
         
         for repo in repos[:10]:
             if repo.get('language'):
@@ -74,7 +71,7 @@ class ProfileScraper:
         
         parts.append(f"\nGitHub统计:")
         parts.append(f"  仓库数: {user_info.get('public_repos', 0)}")
-        parts.append(f"  Stars: {user_info.get('public_gists', 0)}")
+        parts.append(f"  Stars: {sum(repo.get('stargazers_count', 0) for repo in repos)}")
         parts.append(f"  关注者: {user_info.get('followers', 0)}")
         parts.append(f"  创建时间: {user_info.get('created_at', '')[:10]}")
         
@@ -93,10 +90,9 @@ class ProfileScraper:
     async def fetch_linkedin_profile(self, profile_url: str) -> str:
         """从LinkedIn公开页面采集信息（支持用户提供的导出内容或公开页URL）"""
         try:
-            # 尝试提取URL中的用户名
             username = self._extract_linkedin_username(profile_url)
             if username:
-                return f"LinkedIn用户: {username}\n（完整信息需要用户登录后导出PDF或授权API访问）"
+                return f"LinkedIn用户: {username}\n（完整信息需要用户登录后导出PDF或授权API访问）\n建议：上传LinkedIn导出的PDF文件以获取完整信息"
             return f"LinkedIn链接: {profile_url}\n（建议上传LinkedIn导出的PDF文件）"
         except Exception as e:
             return f"LinkedIn采集失败: {str(e)}"
@@ -118,12 +114,10 @@ class ProfileScraper:
             resp = await self.client.get(blog_url)
             resp.raise_for_status()
             
-            # 提取页面标题和主要内容
             content = resp.text
             title_match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE)
             title = title_match.group(1) if title_match else '未知标题'
             
-            # 提取正文文本
             text_content = self._extract_text_from_html(content)
             text_content = text_content[:2000]
             
@@ -132,9 +126,7 @@ class ProfileScraper:
             return f"博客采集失败: {str(e)}"
     
     def _extract_text_from_html(self, html: str) -> str:
-        # 移除标签
         text = re.sub(r'<[^>]+>', ' ', html)
-        # 移除多余空白
         text = re.sub(r'\s+', ' ', text)
         return text.strip()
     
@@ -155,8 +147,6 @@ class ProfileScraper:
         """关闭HTTP客户端"""
         await self.client.aclose()
 
-
-# ── 服务入口 ───────────────────────────────────────────────────
 
 async def import_from_public_sources(sources: List[Any]) -> str:
     """从多个公开来源采集信息并合并"""

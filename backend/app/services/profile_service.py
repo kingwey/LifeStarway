@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.profile import Profile
+from app.models.profile import Profile, ProfileVersion
 from app.schemas.profile import ProfileCreate, ProfileUpdate
 from app.ai import call_llm, RESUME_PARSE_PROMPT, parse_llm_resume
 
@@ -13,11 +13,34 @@ async def get_profile(db: AsyncSession, user_id: str):
     return profile
 
 
+async def _create_version_snapshot(db: AsyncSession, profile: Profile):
+    version = ProfileVersion(
+        user_id=profile.user_id,
+        profile_id=profile.id,
+        version=profile.version,
+        birth_year=profile.birth_year,
+        gender=profile.gender,
+        education=profile.education,
+        major=profile.major,
+        school=profile.school,
+        skills=profile.skills,
+        personality_type=profile.personality_type,
+        current_industry=profile.current_industry,
+        current_role=profile.current_role,
+        work_years=profile.work_years,
+        salary_range=profile.salary_range,
+        career_history=profile.career_history,
+        resume_text=profile.resume_text,
+    )
+    db.add(version)
+
+
 async def create_or_update_profile(db: AsyncSession, user_id: str, data: ProfileCreate):
     result = await db.execute(select(Profile).where(Profile.user_id == user_id))
     existing = result.scalar_one_or_none()
     
     if existing:
+        await _create_version_snapshot(db, existing)
         existing.version += 1
         for key, value in data.dict(exclude_unset=True).items():
             setattr(existing, key, value)
@@ -66,7 +89,16 @@ async def import_resume(db: AsyncSession, user_id: str, resume_text: str):
 
 
 async def get_profile_versions(db: AsyncSession, user_id: str):
-    result = await db.execute(
-        select(Profile).where(Profile.user_id == user_id).order_by(Profile.version.desc())
-    )
-    return result.scalars().all()
+    result = await db.execute(select(Profile).where(Profile.user_id == user_id))
+    current = result.scalar_one_or_none()
+    
+    versions = []
+    if current:
+        versions.append(current)
+        
+        result = await db.execute(
+            select(ProfileVersion).where(ProfileVersion.profile_id == current.id).order_by(ProfileVersion.version.desc())
+        )
+        versions.extend(result.scalars().all())
+    
+    return versions

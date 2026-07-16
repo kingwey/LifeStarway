@@ -36,9 +36,14 @@ async def create_diagnosis(db: AsyncSession, user_id: str, profile_id: str = Non
         "工作履历": json.dumps(profile.career_history, ensure_ascii=False) if profile.career_history else "[]"
     }
     
-    prompt = DIAGNOSIS_PROMPT.format(profile_data=json.dumps(profile_data, ensure_ascii=False))
-    raw_output = await call_llm(prompt)
-    parsed = parse_llm_diagnosis(raw_output)
+    try:
+        prompt = DIAGNOSIS_PROMPT.format(profile_data=json.dumps(profile_data, ensure_ascii=False))
+        raw_output = await call_llm(prompt)
+        parsed = parse_llm_diagnosis(raw_output)
+    except Exception as e:
+        logger = __import__('logging').getLogger('lifestarway.diagnosis')
+        logger.warning(f"LLM诊断失败: {e}")
+        raise HTTPException(status_code=500, detail="职业诊断生成失败，请稍后重试")
     
     diagnosis = Diagnosis(
         user_id=user_id,
@@ -111,14 +116,19 @@ async def generate_plan(db: AsyncSession, user_id: str, plan_type: str, diagnosi
         "总结": diagnosis.summary
     }
     
-    prompt = PLANNING_PROMPT.format(
-        plan_type=plan_type,
-        plan_type_desc=PLAN_TYPE_DESCS[plan_type],
-        profile_data=json.dumps(profile_data, ensure_ascii=False),
-        diagnosis_data=json.dumps(diagnosis_data, ensure_ascii=False)
-    )
-    raw_output = await call_llm(prompt)
-    parsed = parse_llm_plan(raw_output)
+    try:
+        prompt = PLANNING_PROMPT.format(
+            plan_type=plan_type,
+            plan_type_desc=PLAN_TYPE_DESCS[plan_type],
+            profile_data=json.dumps(profile_data, ensure_ascii=False),
+            diagnosis_data=json.dumps(diagnosis_data, ensure_ascii=False)
+        )
+        raw_output = await call_llm(prompt)
+        parsed = parse_llm_plan(raw_output)
+    except Exception as e:
+        logger = __import__('logging').getLogger('lifestarway.plan')
+        logger.warning(f"LLM规划失败: {e}")
+        raise HTTPException(status_code=500, detail="职业规划生成失败，请稍后重试")
     
     plan = Plan(
         user_id=user_id,

@@ -45,12 +45,15 @@ class Settings(BaseSettings):
     # Tavily 搜索
     TAVILY_API_KEY: str = ""
 
+    # GitHub API Token
+    GITHUB_TOKEN: str = ""
+
     # LLM 连接参数（留空则由 LLM_PROVIDER 自动推导）
     LLM_API_KEY: str = ""
     LLM_API_BASE: str = ""
     LLM_MODEL: str = ""
 
-    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000,http://localhost:5175,http://localhost:8080"
 
     def get_llm_config(self) -> tuple[str, str, str]:
         """返回 (api_key, api_base, model)，支持手动覆盖和自动推导。"""

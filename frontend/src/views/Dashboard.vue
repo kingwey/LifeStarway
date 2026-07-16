@@ -163,10 +163,14 @@ onMounted(async () => {
   try {
     const diagRes = await diagnosisApi.latest()
     diagnosis.value = diagRes.data
-  } catch {}
+  } catch (error) {
+    console.warn('获取诊断失败:', error.message)
+  }
   try {
     const planRes = await planApi.list()
     plans.value = planRes.data
-  } catch {}
+  } catch (error) {
+    console.warn('获取规划失败:', error.message)
+  }
 })
 </script>

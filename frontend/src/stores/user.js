@@ -27,7 +27,8 @@ export const useUserStore = defineStore('user', () => {
       const response = await authApi.me()
       user.value = response.data
       localStorage.setItem('user', JSON.stringify(user.value))
-    } catch {
+    } catch (error) {
+      console.warn('获取用户信息失败:', error.message)
       logout()
     }
   }
@@ -36,7 +37,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       const response = await profileApi.get()
       profile.value = response.data
-    } catch {
+    } catch (error) {
+      console.warn('获取档案信息失败:', error.message)
       profile.value = null
     }
   }

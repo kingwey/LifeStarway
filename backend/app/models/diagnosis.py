@@ -11,7 +11,7 @@ class Diagnosis(Base):
 
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     user_id = Column(GUID, ForeignKey("users.id"), nullable=False)
-    profile_id = Column(GUID, ForeignKey("profiles.id"), nullable=False)
+    profile_id = Column(GUID, ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False)
     profile_version = Column(Integer, nullable=False)
     
     health_score = Column(Float)

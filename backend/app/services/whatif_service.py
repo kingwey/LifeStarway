@@ -33,12 +33,17 @@ async def create_simulation(db: AsyncSession, user_id: str, hypothesis: dict, pr
         "工作履历": json.dumps(profile.career_history, ensure_ascii=False) if profile.career_history else "[]"
     }
     
-    prompt = WHATIF_PROMPT.format(
-        profile_data=json.dumps(profile_data, ensure_ascii=False),
-        hypothesis=json.dumps(hypothesis, ensure_ascii=False)
-    )
-    raw_output = await call_llm(prompt)
-    parsed = parse_llm_whatif(raw_output)
+    try:
+        prompt = WHATIF_PROMPT.format(
+            profile_data=json.dumps(profile_data, ensure_ascii=False),
+            hypothesis=json.dumps(hypothesis, ensure_ascii=False)
+        )
+        raw_output = await call_llm(prompt)
+        parsed = parse_llm_whatif(raw_output)
+    except Exception as e:
+        logger = __import__('logging').getLogger('lifestarway.whatif')
+        logger.warning(f"LLM模拟失败: {e}")
+        raise HTTPException(status_code=500, detail="模拟分析失败，请稍后重试")
     
     simulation = Simulation(
         user_id=user_id,

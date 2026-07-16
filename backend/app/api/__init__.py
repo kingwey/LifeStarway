@@ -4,6 +4,7 @@ from app.api.diagnosis import router as diagnosis_router
 from app.api.plan import router as plan_router
 from app.api.starmap import router as starmap_router
 from app.api.whatif import router as whatif_router
+from app.api.user import router as user_router
 
 routers = [
     auth_router,
@@ -11,5 +12,6 @@ routers = [
     diagnosis_router,
     plan_router,
     starmap_router,
-    whatif_router
+    whatif_router,
+    user_router
 ]

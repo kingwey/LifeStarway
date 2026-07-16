@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 import json
 
@@ -69,11 +69,18 @@ async def get_latest_diagnosis(db: AsyncSession, user_id: str):
     return result.scalar_one_or_none()
 
 
-async def get_diagnoses(db: AsyncSession, user_id: str):
+async def get_diagnoses(db: AsyncSession, user_id: str, skip: int = 0, limit: int = 20):
     result = await db.execute(
-        select(Diagnosis).where(Diagnosis.user_id == user_id).order_by(Diagnosis.created_at.desc())
+        select(Diagnosis).where(Diagnosis.user_id == user_id).order_by(Diagnosis.created_at.desc()).offset(skip).limit(limit)
     )
     return result.scalars().all()
+
+
+async def get_diagnoses_count(db: AsyncSession, user_id: str) -> int:
+    result = await db.execute(
+        select(func.count(Diagnosis.id)).where(Diagnosis.user_id == user_id)
+    )
+    return result.scalar() or 0
 
 
 async def generate_plan(db: AsyncSession, user_id: str, plan_type: str, diagnosis_id: str = None):
@@ -147,9 +154,14 @@ async def generate_plan(db: AsyncSession, user_id: str, plan_type: str, diagnosi
     return plan
 
 
-async def get_plans(db: AsyncSession, user_id: str):
-    result = await db.execute(select(Plan).where(Plan.user_id == user_id).order_by(Plan.created_at.desc()))
+async def get_plans(db: AsyncSession, user_id: str, skip: int = 0, limit: int = 20):
+    result = await db.execute(select(Plan).where(Plan.user_id == user_id).order_by(Plan.created_at.desc()).offset(skip).limit(limit))
     return result.scalars().all()
+
+
+async def get_plans_count(db: AsyncSession, user_id: str) -> int:
+    result = await db.execute(select(func.count(Plan.id)).where(Plan.user_id == user_id))
+    return result.scalar() or 0
 
 
 async def get_plan(db: AsyncSession, user_id: str, plan_id: str):

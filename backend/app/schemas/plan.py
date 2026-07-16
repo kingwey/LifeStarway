@@ -30,3 +30,10 @@ class PlanResponse(BaseModel):
     created_at: str
 
     model_config = {"from_attributes": True}
+
+
+class PlanListResponse(BaseModel):
+    items: List[PlanResponse]
+    total: int
+    skip: int
+    limit: int

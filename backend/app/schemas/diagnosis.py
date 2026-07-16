@@ -27,3 +27,10 @@ class DiagnosisResponse(BaseModel):
     created_at: str
 
     model_config = {"from_attributes": True}
+
+
+class DiagnosisListResponse(BaseModel):
+    items: List[DiagnosisResponse]
+    total: int
+    skip: int
+    limit: int

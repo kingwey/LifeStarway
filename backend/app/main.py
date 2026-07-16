@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api import routers
 from app.database import engine, Base
@@ -49,19 +48,37 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-# 请求日志中间件
-class LoggingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
+# 纯 ASGI 请求日志中间件（避免 BaseHTTPMiddleware 性能问题）
+class LoggingMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
         start_time = time.time()
+        method = scope.get("method", "")
+        path = scope.get("path", "")
+
+        status_code = 200
+
+        async def wrapped_send(message):
+            nonlocal status_code
+            if message["type"] == "http.response.start":
+                status_code = message.get("status", 200)
+            await send(message)
+
         try:
-            response = await call_next(request)
+            await self.app(scope, receive, wrapped_send)
         except Exception as exc:
-            logger.error(f"{request.method} {request.url.path} - 500 - 异常: {exc}")
+            logger.error(f"{method} {path} - 500 - 异常: {exc}")
             raise
-        duration_ms = (time.time() - start_time) * 1000
-        level = logging.WARNING if response.status_code >= 400 else logging.INFO
-        logger.log(level, f"{request.method} {request.url.path} - {response.status_code} - {duration_ms:.0f}ms")
-        return response
+        finally:
+            duration_ms = (time.time() - start_time) * 1000
+            level = logging.WARNING if status_code >= 400 else logging.INFO
+            logger.log(level, f"{method} {path} - {status_code} - {duration_ms:.0f}ms")
 
 
 app.add_middleware(LoggingMiddleware)
@@ -98,6 +115,7 @@ async def health_check():
         checks["status"] = "degraded"
 
     return checks
+
 
 if __name__ == "__main__":
     import uvicorn

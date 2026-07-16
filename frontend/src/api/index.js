@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { ElMessage } from 'element-plus'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
@@ -7,6 +8,7 @@ const api = axios.create({
   timeout: 60000,
 })
 
+// 请求拦截器
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -20,14 +22,29 @@ api.interceptors.request.use(
   }
 )
 
+// 响应拦截器
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status
+    const detail = error.response?.data?.detail || error.response?.data?.message
+
+    if (status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
+    } else if (status === 422) {
+      ElMessage.error(detail || '请求参数错误，请检查输入')
+    } else if (status >= 500) {
+      ElMessage.error(detail || '服务器繁忙，请稍后重试')
+    } else if (status >= 400) {
+      ElMessage.error(detail || '请求失败')
+    } else if (error.code === 'ECONNABORTED') {
+      ElMessage.error('请求超时，请检查网络连接')
+    } else {
+      ElMessage.error('网络异常，请稍后重试')
     }
+
     return Promise.reject(error)
   }
 )

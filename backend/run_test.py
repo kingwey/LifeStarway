@@ -58,7 +58,7 @@ for method, path in endpoints:
 # 3. 注册登录流程
 print('\n--- 认证流程测试 ---')
 test_email = f'test_{uuid.uuid4().hex[:8]}@test.com'
-test_password = 'test123'
+test_password = 'Test123!@'
 test_nickname = 'testuser'
 
 try:

@@ -31,10 +31,28 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="人生星途 LifeStarway",
-    description="数据沉淀迭代式AI全生命周期职业生涯规划系统",
+    title="人生星途 LifeStarway API",
+    description="""
+    数据沉淀迭代式AI全生命周期职业生涯规划系统后端API。
+
+    ## 核心模块
+    - **认证**: 用户注册、登录、JWT Token 管理
+    - **人生档案**: 个人信息、教育背景、职业履历、技能矩阵
+    - **职业诊断**: AI 驱动的五维度职业健康度评估
+    - **规划方案**: 短/中/长期职业规划生成
+    - **人生星图**: 职业发展路径可视化
+    - **What-If 沙盒**: 假设场景模拟分析
+    - **公开信息采集**: GitHub、LinkedIn、博客等来源导入
+
+    ## 使用说明
+    1. 先调用 `/api/auth/register` 注册账号
+    2. 使用 `/api/auth/login` 获取 access_token
+    3. 在请求头中携带 `Authorization: Bearer <token>`
+    """,
     version="1.0.0",
     lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 

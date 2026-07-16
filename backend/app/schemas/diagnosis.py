@@ -1,3 +1,5 @@
+from uuid import UUID
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -15,16 +17,16 @@ class DiagnosisCreate(BaseModel):
 
 
 class DiagnosisResponse(BaseModel):
-    id: str
-    user_id: str
-    profile_id: str
+    id: UUID
+    user_id: UUID
+    profile_id: UUID
     profile_version: int
     health_score: float
     dimensions: Dimensions
     strengths: List[str]
     risks: List[str]
     summary: str
-    created_at: str
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 

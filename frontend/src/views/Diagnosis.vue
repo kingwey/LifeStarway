@@ -139,12 +139,14 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import Sidebar from '../components/Sidebar.vue'
 import { useUserStore } from '../stores/user'
-import { diagnosisApi } from '../api'
+import { useAppStore } from '../stores/app'
 import { ElMessage } from 'element-plus'
 
 const userStore = useUserStore()
+const appStore = useAppStore()
+
 const diagnosis = ref(null)
-const diagnoses = ref([])
+const diagnoses = computed(() => appStore.diagnoses)
 const comparisonDiagnosis = ref(null)
 const compareMode = ref(false)
 const loading = ref(false)
@@ -252,9 +254,8 @@ const selectDiagnosis = (item) => {
 const handleDiagnose = async () => {
   loading.value = true
   try {
-    const response = await diagnosisApi.create({})
-    diagnosis.value = response.data
-    await fetchDiagnoses()
+    const data = await appStore.createDiagnosis({})
+    diagnosis.value = data
     ElMessage.success('诊断完成')
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || '诊断失败')
@@ -264,13 +265,10 @@ const handleDiagnose = async () => {
 }
 
 const fetchDiagnoses = async () => {
-  try {
-    const response = await diagnosisApi.list()
-    diagnoses.value = response.data
-    if (diagnoses.value.length) {
-      diagnosis.value = diagnoses.value[0]
-    }
-  } catch {}
+  await appStore.fetchDiagnoses()
+  if (diagnoses.value.length && !diagnosis.value) {
+    diagnosis.value = diagnoses.value[0]
+  }
 }
 
 onMounted(async () => {

@@ -132,14 +132,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import Sidebar from '../components/Sidebar.vue'
 import { useUserStore } from '../stores/user'
-import { diagnosisApi, planApi } from '../api'
+import { useAppStore } from '../stores/app'
 
 const userStore = useUserStore()
-const diagnosis = ref(null)
-const plans = ref([])
+const appStore = useAppStore()
+
+const diagnosis = computed(() => appStore.latestDiagnosis)
+const plans = computed(() => appStore.plans)
 
 const healthColor = computed(() => {
   const score = diagnosis.value?.health_score || 0
@@ -148,9 +150,7 @@ const healthColor = computed(() => {
   return 'text-red-400'
 })
 
-const milestoneCount = computed(() => {
-  return plans.value.reduce((sum, plan) => sum + (plan.milestones?.length || 0), 0)
-})
+const milestoneCount = computed(() => appStore.milestoneCount)
 
 const getDimensionColor = (value) => {
   if (value >= 80) return '#4ade80'
@@ -160,17 +160,6 @@ const getDimensionColor = (value) => {
 
 onMounted(async () => {
   await userStore.fetchProfile()
-  try {
-    const diagRes = await diagnosisApi.latest()
-    diagnosis.value = diagRes.data
-  } catch (error) {
-    console.warn('获取诊断失败:', error.message)
-  }
-  try {
-    const planRes = await planApi.list()
-    plans.value = planRes.data
-  } catch (error) {
-    console.warn('获取规划失败:', error.message)
-  }
+  await appStore.loadAll()
 })
 </script>

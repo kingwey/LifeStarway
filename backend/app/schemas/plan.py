@@ -1,3 +1,5 @@
+from uuid import UUID
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -18,16 +20,16 @@ class PlanCreate(BaseModel):
 
 
 class PlanResponse(BaseModel):
-    id: str
-    user_id: str
-    diagnosis_id: str
+    id: UUID
+    user_id: UUID
+    diagnosis_id: UUID
     plan_type: str
     title: str
     description: str
     milestones: List[Milestone] = Field(default_factory=list)
     recommended_path: dict = Field(default_factory=dict)
     alternative_paths: List[dict] = Field(default_factory=list)
-    created_at: str
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 

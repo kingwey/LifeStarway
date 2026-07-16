@@ -21,6 +21,7 @@ export const useAppStore = defineStore('app', () => {
   const hasDiagnoses = computed(() => diagnoses.value.length > 0)
   const hasPlans = computed(() => plans.value.length > 0)
   const milestoneCount = computed(() => {
+    if (!Array.isArray(plans.value)) return 0
     return plans.value.reduce((sum, plan) => sum + (plan.milestones?.length || 0), 0)
   })
 

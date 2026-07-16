@@ -190,13 +190,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Sidebar from '../components/Sidebar.vue'
-import { diagnosisApi, planApi } from '../api'
+import { useAppStore } from '../stores/app'
 import { ElMessage } from 'element-plus'
+
+const appStore = useAppStore()
 
 const formRef = ref(null)
 const loading = ref(false)
-const diagnosis = ref(null)
-const plans = ref([])
+const diagnosis = computed(() => appStore.latestDiagnosis)
+const plans = computed(() => appStore.plans)
 const selectedPlan = ref(null)
 const activePath = ref('recommended')
 
@@ -260,9 +262,8 @@ const selectPlan = (plan) => {
 const handleGenerate = async () => {
   loading.value = true
   try {
-    const response = await planApi.generate({ plan_type: form.value.plan_type })
-    plans.value.unshift(response.data)
-    selectedPlan.value = response.data
+    const data = await appStore.generatePlan({ plan_type: form.value.plan_type })
+    selectedPlan.value = data
     ElMessage.success('规划生成成功')
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || '生成失败')
@@ -272,17 +273,10 @@ const handleGenerate = async () => {
 }
 
 onMounted(async () => {
-  try {
-    const diagRes = await diagnosisApi.latest()
-    diagnosis.value = diagRes.data
-  } catch {}
-  
-  try {
-    const planRes = await planApi.list()
-    plans.value = planRes.data
-    if (plans.value.length) {
-      selectedPlan.value = plans.value[0]
-    }
-  } catch {}
+  await appStore.fetchDiagnoses()
+  await appStore.fetchPlans()
+  if (plans.value.length && !selectedPlan.value) {
+    selectedPlan.value = plans.value[0]
+  }
 })
 </script>

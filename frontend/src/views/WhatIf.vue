@@ -12,7 +12,7 @@
           <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
             <h3 class="text-lg font-semibold mb-4">创建模拟</h3>
             
-            <div v-if="!userStore.profile" class="text-center text-white/40 py-8">
+            <div v-if="!appStore.profile" class="text-center text-white/40 py-8">
               <p>请先完善人生档案</p>
               <el-button type="primary" size="small" @click="$router.push('/profile')" class="mt-4">去完善</el-button>
             </div>
@@ -54,7 +54,7 @@
                 </el-form-item>
                 
                 <el-form-item label="备注说明">
-                  <el-textarea v-model="form.hypothesis.note" rows="3" placeholder="其他补充信息，如：已有相关经验、家庭支持情况等"></el-textarea>
+                  <el-input v-model="form.hypothesis.note" type="textarea" :rows="3" placeholder="其他补充信息，如：已有相关经验、家庭支持情况等"></el-input>
                 </el-form-item>
                 
                 <el-button 
@@ -220,17 +220,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import Sidebar from '../components/Sidebar.vue'
-import { useUserStore } from '../stores/user'
-import { simulationApi, planApi } from '../api'
+import { useAppStore } from '../stores/app'
 import { ElMessage } from 'element-plus'
 
-const userStore = useUserStore()
+const appStore = useAppStore()
+
 const formRef = ref(null)
 const loading = ref(false)
 const simulation = ref(null)
-const simulations = ref([])
+const simulations = computed(() => appStore.simulations)
 const originalMilestones = ref([])
 
 const resourceLevelMap = {
@@ -283,12 +283,11 @@ const handleSimulate = async () => {
     ElMessage.warning('请选择假设场景')
     return
   }
-  
+
   loading.value = true
   try {
-    const response = await simulationApi.create({ hypothesis: form.hypothesis })
-    simulation.value = response.data
-    await fetchSimulations()
+    const data = await appStore.createSimulation({ hypothesis: form.hypothesis })
+    simulation.value = data
     ElMessage.success('模拟完成')
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || '模拟失败')
@@ -298,24 +297,18 @@ const handleSimulate = async () => {
 }
 
 const fetchSimulations = async () => {
-  try {
-    const response = await simulationApi.list()
-    simulations.value = response.data
-  } catch {}
+  await appStore.fetchSimulations()
 }
 
 const fetchOriginalPlan = async () => {
-  try {
-    const response = await planApi.list()
-    const plans = response.data
-    if (plans.length) {
-      originalMilestones.value = plans[0].milestones || []
-    }
-  } catch {}
+  await appStore.fetchPlans()
+  if (appStore.plans.length) {
+    originalMilestones.value = appStore.plans[0].milestones || []
+  }
 }
 
 onMounted(async () => {
-  await userStore.fetchProfile()
+  await appStore.fetchProfile()
   await fetchSimulations()
   await fetchOriginalPlan()
 })

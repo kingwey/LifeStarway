@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative">
     <Sidebar />
-    <main class="ml-64 p-8">
+    <main class="ml-64 p-8 relative z-10">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold">What-If 沙盒</h2>
-        <p class="text-white/60 mt-1">模拟不同选择，探索您的人生轨迹变化</p>
+        <h2 class="text-3xl font-bold gradient-text">What-If 沙盒</h2>
+        <p class="text-white/60 mt-2">模拟不同选择，探索您的人生轨迹变化</p>
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-1">
-          <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div class="glass-card p-6">
             <h3 class="text-lg font-semibold mb-4">创建模拟</h3>
             
             <div v-if="!appStore.profile" class="text-center text-white/40 py-8">
@@ -75,7 +75,7 @@
             </div>
           </div>
           
-          <div v-if="simulations.length" class="mt-6 bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div v-if="simulations.length" class="mt-6 glass-card p-6">
             <h3 class="text-lg font-semibold mb-4">历史模拟</h3>
             <div class="space-y-2">
               <div 
@@ -93,7 +93,7 @@
         </div>
         
         <div class="lg:col-span-2">
-          <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div class="glass-card p-6">
             <div v-if="simulation" class="space-y-6">
               <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold">模拟结果</h3>

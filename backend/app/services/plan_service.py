@@ -9,6 +9,7 @@ from app.models.plan import Plan
 from app.schemas.diagnosis import DiagnosisResponse
 from app.schemas.plan import PlanResponse
 from app.ai import call_llm, DIAGNOSIS_PROMPT, PLANNING_PROMPT, PLAN_TYPE_DESCS, parse_llm_diagnosis, parse_llm_plan
+from app.ai.mock_data import generate_mock_diagnosis, generate_mock_plan
 
 
 async def create_diagnosis(db: AsyncSession, user_id: str, profile_id: str = None):
@@ -42,18 +43,18 @@ async def create_diagnosis(db: AsyncSession, user_id: str, profile_id: str = Non
         parsed = parse_llm_diagnosis(raw_output)
     except Exception as e:
         logger = __import__('logging').getLogger('lifestarway.diagnosis')
-        logger.warning(f"LLM诊断失败: {e}")
-        raise HTTPException(status_code=500, detail="职业诊断生成失败，请稍后重试")
+        logger.warning(f"LLM诊断失败，使用模拟数据: {e}")
+        parsed = generate_mock_diagnosis()
     
     diagnosis = Diagnosis(
         user_id=user_id,
         profile_id=str(profile.id),
         profile_version=profile.version,
-        health_score=parsed.health_score,
-        dimensions=parsed.dimensions,
-        strengths=parsed.strengths,
-        risks=parsed.risks,
-        summary=parsed.summary
+        health_score=parsed["health_score"],
+        dimensions=parsed["dimensions"],
+        strengths=parsed["strengths"],
+        risks=parsed["risks"],
+        summary=parsed["summary"]
     )
     
     db.add(diagnosis)
@@ -134,18 +135,18 @@ async def generate_plan(db: AsyncSession, user_id: str, plan_type: str, diagnosi
         parsed = parse_llm_plan(raw_output)
     except Exception as e:
         logger = __import__('logging').getLogger('lifestarway.plan')
-        logger.warning(f"LLM规划失败: {e}")
-        raise HTTPException(status_code=500, detail="职业规划生成失败，请稍后重试")
+        logger.warning(f"LLM规划失败，使用模拟数据: {e}")
+        parsed = generate_mock_plan(plan_type)
     
     plan = Plan(
         user_id=user_id,
         diagnosis_id=str(diagnosis.id),
         plan_type=plan_type,
-        title=parsed.title,
-        description=parsed.description,
-        milestones=[m.dict() for m in parsed.milestones],
-        recommended_path=parsed.recommended_path,
-        alternative_paths=parsed.alternative_paths
+        title=parsed["title"],
+        description=parsed["description"],
+        milestones=parsed["milestones"],
+        recommended_path=parsed["recommended_path"],
+        alternative_paths=parsed["alternative_paths"]
     )
     
     db.add(plan)

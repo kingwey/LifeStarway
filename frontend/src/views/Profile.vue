@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative">
     <Sidebar />
-    <main class="ml-64 p-8">
+    <main class="ml-64 p-8 relative z-10">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold">人生档案</h2>
-        <p class="text-white/60 mt-1">管理您的个人职业信息，一次填写终身受用</p>
+        <h2 class="text-3xl font-bold gradient-text">人生档案</h2>
+        <p class="text-white/60 mt-2">管理您的个人职业信息，一次填写终身受用</p>
       </div>
       
-      <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+      <div class="glass-card p-6">
         <el-steps :active="activeStep" align-center class="mb-8">
           <el-step title="基本信息" icon="User" />
           <el-step title="教育背景" icon="GraduationCap" />
@@ -15,6 +15,7 @@
           <el-step title="技能特长" icon="Star" />
         </el-steps>
         
+
         <el-form :model="form" ref="formRef" class="space-y-6">
           <div v-if="activeStep === 0" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative">
     <Sidebar />
-    <main class="ml-64 p-8">
+    <main class="ml-64 p-8 relative z-10">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold">人生星图</h2>
-        <p class="text-white/60 mt-1">以星空方式呈现您的人生蓝图，每个里程碑都是一颗星</p>
+        <h2 class="text-3xl font-bold gradient-text">人生星图</h2>
+        <p class="text-white/60 mt-2">以星空方式呈现您的人生蓝图，每个里程碑都是一颗星</p>
       </div>
       
-      <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+      <div class="glass-card p-6">
         <div v-if="loading" class="flex items-center justify-center py-20">
           <el-loading :text="'正在绘制星图...'" />
         </div>

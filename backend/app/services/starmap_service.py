@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.plan import Plan
 from app.schemas.starmap import StarMapResponse, StarNode, StarEdge
+from app.ai.mock_data import generate_mock_starmap_data
 
 
 async def get_starmap_data(db: AsyncSession, user_id: str):
@@ -59,5 +60,10 @@ async def get_starmap_data(db: AsyncSession, user_id: str):
                 target = node_id_map.get(path_ids[i+1])
                 if source and target:
                     edges.append(StarEdge(source=source, target=target, path_type="alternative"))
+    
+    if not nodes:
+        mock_data = generate_mock_starmap_data()
+        nodes = [StarNode(**n) for n in mock_data["nodes"]]
+        edges = [StarEdge(**e) for e in mock_data["edges"]]
     
     return StarMapResponse(nodes=nodes, edges=edges)

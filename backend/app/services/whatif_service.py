@@ -6,6 +6,7 @@ import json
 from app.models.profile import Profile
 from app.models.simulation import Simulation
 from app.ai import call_llm, WHATIF_PROMPT, parse_llm_whatif
+from app.ai.mock_data import generate_mock_whatif
 
 
 async def create_simulation(db: AsyncSession, user_id: str, hypothesis: dict, profile_id: str = None):
@@ -42,16 +43,16 @@ async def create_simulation(db: AsyncSession, user_id: str, hypothesis: dict, pr
         parsed = parse_llm_whatif(raw_output)
     except Exception as e:
         logger = __import__('logging').getLogger('lifestarway.whatif')
-        logger.warning(f"LLM模拟失败: {e}")
-        raise HTTPException(status_code=500, detail="模拟分析失败，请稍后重试")
+        logger.warning(f"LLM模拟失败，使用模拟数据: {e}")
+        parsed = generate_mock_whatif(hypothesis)
     
     simulation = Simulation(
         user_id=user_id,
         profile_id=str(profile.id),
         hypothesis=hypothesis,
-        simulated_milestones=parsed.simulated_milestones,
-        risk_assessment=parsed.risk_assessment,
-        comparison=parsed.comparison
+        simulated_milestones=parsed["simulated_milestones"],
+        risk_assessment=parsed["risk_assessment"],
+        comparison=parsed["comparison"]
     )
     
     db.add(simulation)

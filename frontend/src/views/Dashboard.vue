@@ -1,64 +1,68 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative">
     <Sidebar />
-    <main class="ml-64 p-8">
+    <main class="ml-64 p-8 relative z-10">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold">仪表盘</h2>
-        <p class="text-white/60 mt-1">欢迎回来，{{ userStore.user?.nickname }} · 您的职业规划总览</p>
+        <h2 class="text-3xl font-bold gradient-text">仪表盘</h2>
+        <p class="text-white/60 mt-2">欢迎回来，{{ userStore.user?.nickname }} · 您的职业规划总览</p>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
-          <div class="flex items-center justify-between">
+        <div class="glass-card glass-card-hover p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-full -mr-16 -mt-16"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
               <p class="text-white/60 text-sm">职业健康度</p>
-              <p class="text-3xl font-bold mt-2" :class="healthColor">{{ diagnosis?.health_score || '--' }}</p>
+              <p class="text-4xl font-bold mt-2" :class="healthColor">{{ diagnosis?.health_score || '--' }}</p>
             </div>
-            <div class="w-14 h-14 bg-star-primary/20 rounded-xl flex items-center justify-center">
-              <span class="text-2xl">❤️</span>
+            <div class="w-16 h-16 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center">
+              <span class="text-3xl">❤️</span>
             </div>
           </div>
         </div>
         
-        <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
-          <div class="flex items-center justify-between">
+        <div class="glass-card glass-card-hover p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full -mr-16 -mt-16"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
               <p class="text-white/60 text-sm">规划方案</p>
-              <p class="text-3xl font-bold mt-2">{{ plans.length }}</p>
+              <p class="text-4xl font-bold mt-2 text-star-cyan">{{ plans.length }}</p>
             </div>
-            <div class="w-14 h-14 bg-star-cyan/20 rounded-xl flex items-center justify-center">
-              <span class="text-2xl">📋</span>
+            <div class="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center">
+              <span class="text-3xl">📋</span>
             </div>
           </div>
         </div>
         
-        <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
-          <div class="flex items-center justify-between">
+        <div class="glass-card glass-card-hover p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-500/10 to-transparent rounded-full -mr-16 -mt-16"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
               <p class="text-white/60 text-sm">里程碑</p>
-              <p class="text-3xl font-bold mt-2">{{ milestoneCount }}</p>
+              <p class="text-4xl font-bold mt-2 text-star-pink">{{ milestoneCount }}</p>
             </div>
-            <div class="w-14 h-14 bg-star-pink/20 rounded-xl flex items-center justify-center">
-              <span class="text-2xl">⭐</span>
+            <div class="w-16 h-16 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
+              <span class="text-3xl">⭐</span>
             </div>
           </div>
         </div>
         
-        <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
-          <div class="flex items-center justify-between">
+        <div class="glass-card glass-card-hover p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full -mr-16 -mt-16"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
               <p class="text-white/60 text-sm">档案版本</p>
-              <p class="text-3xl font-bold mt-2">{{ userStore.profile?.version || 0 }}</p>
+              <p class="text-4xl font-bold mt-2 text-star-secondary">{{ userStore.profile?.version || 0 }}</p>
             </div>
-            <div class="w-14 h-14 bg-star-secondary/20 rounded-xl flex items-center justify-center">
-              <span class="text-2xl">📁</span>
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center">
+              <span class="text-3xl">📁</span>
             </div>
           </div>
         </div>
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+        <div class="glass-card p-6">
           <h3 class="text-lg font-semibold mb-4">职业诊断结果</h3>
           <div v-if="diagnosis" class="space-y-4">
             <div class="flex items-center justify-between">
@@ -88,7 +92,7 @@
           </div>
         </div>
         
-        <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+        <div class="glass-card p-6">
           <h3 class="text-lg font-semibold mb-4">最近规划</h3>
           <div v-if="plans.length" class="space-y-3">
             <div v-for="plan in plans.slice(0, 3)" :key="plan.id" class="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
@@ -106,7 +110,7 @@
         </div>
       </div>
       
-      <div class="mt-6 bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+      <div class="mt-6 glass-card p-6">
         <h3 class="text-lg font-semibold mb-4">快速操作</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button @click="$router.push('/profile')" class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors text-center">

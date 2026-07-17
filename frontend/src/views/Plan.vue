@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative">
     <Sidebar />
-    <main class="ml-64 p-8">
+    <main class="ml-64 p-8 relative z-10">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold">规划方案</h2>
-        <p class="text-white/60 mt-1">生成短期、中期、长期职业规划，规划您的人生路线</p>
+        <h2 class="text-3xl font-bold gradient-text">规划方案</h2>
+        <p class="text-white/60 mt-2">生成短期、中期、长期职业规划，规划您的人生路线</p>
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-1">
-          <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div class="glass-card p-6">
             <h3 class="text-lg font-semibold mb-4">生成规划</h3>
             <div v-if="!diagnosis" class="text-center text-white/40 py-8">
               <p>请先进行职业诊断</p>
@@ -36,7 +36,7 @@
             </div>
           </div>
           
-          <div v-if="plans.length" class="mt-6 bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div v-if="plans.length" class="mt-6 glass-card p-6">
             <h3 class="text-lg font-semibold mb-4">规划列表</h3>
             <div class="space-y-2">
               <div 
@@ -54,7 +54,7 @@
         </div>
         
         <div class="lg:col-span-2">
-          <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div class="glass-card p-6">
             <div v-if="selectedPlan" class="space-y-6">
               <div class="flex items-center justify-between">
                 <div>

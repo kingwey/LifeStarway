@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative">
     <Sidebar />
-    <main class="ml-64 p-8">
+    <main class="ml-64 p-8 relative z-10">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold">职业诊断</h2>
-        <p class="text-white/60 mt-1">AI智能评估您的职业健康度，发现优势与风险</p>
+        <h2 class="text-3xl font-bold gradient-text">职业诊断</h2>
+        <p class="text-white/60 mt-2">AI智能评估您的职业健康度，发现优势与风险</p>
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div class="lg:col-span-1">
-          <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div class="glass-card p-6">
             <h3 class="text-lg font-semibold mb-4">开始诊断</h3>
             <div v-if="!userStore.profile" class="text-center text-white/40 py-8">
               <p>请先完善人生档案</p>
@@ -28,7 +28,7 @@
             </div>
           </div>
           
-          <div v-if="diagnoses.length > 1" class="mt-6 bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div v-if="diagnoses.length > 1" class="mt-6 glass-card p-6">
             <h3 class="text-lg font-semibold mb-4">历史记录</h3>
             <div class="space-y-2">
               <div 
@@ -47,7 +47,7 @@
         </div>
         
         <div class="lg:col-span-3">
-          <div class="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+          <div class="glass-card p-6">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-lg font-semibold">诊断结果</h3>
               <div v-if="diagnoses.length > 1" class="flex gap-2">

@@ -51,8 +51,4 @@ services:
     environment:
       PORT: ${PORT}
     depends_on:
-<<<<<<< HEAD
       - backend
-=======
-      - backend
->>>>>>> 6c2ab487d8b79556a9e60f71c0622b8450b738c6

@@ -1,0 +1,73 @@
+services:
+  - type: web
+    name: lifestarway-backend
+    runtime: python
+    plan: starter
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lifestarway-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: lifestarway-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: CORS_ORIGINS
+        value: https://lifestarway.onrender.com,http://localhost:5173
+      - key: LLM_PROVIDER
+        value: dashscope
+      - key: DASHSCOPE_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: qwen-plus
+
+  - type: web
+    name: lifestarway-frontend
+    runtime: static
+    plan: starter
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    healthCheckPath: /
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: sameorigin
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+
+  - type: keyvalue
+    name: lifestarway-redis
+    plan: starter
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  - name: lifestarway-db
+    databaseName: lifestarway
+    user: lifestarway
+    plan: starter
+
+envVarGroups:
+  - name: lifestarway-secrets
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DASHSCOPE_API_KEY
+        sync: false

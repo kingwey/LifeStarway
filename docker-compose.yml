@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: lifestarway
       POSTGRES_USER: lifestarway
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lifestarway_dev}
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-lifestarway_dev}"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U lifestarway"]
       interval: 5s
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
     env_file: ./backend/.env
     environment:
-      DATABASE_URL: postgresql+asyncpg://lifestarway:${POSTGRES_PASSWORD:-lifestarway_dev}@db:5432/lifestarway
+      DATABASE_URL: "postgresql+asyncpg://lifestarway:${POSTGRES_PASSWORD:-lifestarway_dev}@db:5432/lifestarway"
       REDIS_URL: redis://redis:6379/0
       PORT: ${PORT}
     depends_on:

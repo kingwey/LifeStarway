@@ -1,17 +1,12 @@
 version: "3.9"
 services:
-  # PostgreSQL 数据库
   db:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: lifestarway
       POSTGRES_USER: lifestarway
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:- lifestarway_dev}
-    # Render免费环境不支持持久卷，注释
-    # volumes:
-    #   - pgdata:/var/lib/postgresql/data
-    # ports配置全部删除，Blueprint禁止端口映射
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lifestarway_dev}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U lifestarway"]
       interval: 5s
@@ -19,15 +14,10 @@ services:
       retries: 5
       start_period: 10s
 
-  # Redis 缓存
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    # volumes注释
-    # volumes:
-    #   - redisdata:/data
-    # ports删除
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -35,17 +25,14 @@ services:
       retries: 5
       start_period: 5s
 
-  # 后端 API
   backend:
     build: ./backend
     restart: unless-stopped
     env_file: ./backend/.env
     environment:
-      DATABASE_URL: postgresql+asyncpg://lifestarway:${POSTGRES_PASSWORD:- lifestarway_dev}@db:5432/lifestarway
+      DATABASE_URL: postgresql+asyncpg://lifestarway:${POSTGRES_PASSWORD:-lifestarway_dev}@db:5432/lifestarway
       REDIS_URL: redis://redis:6379/0
-      # 注入Render动态端口
       PORT: ${PORT}
-    # 删除ports
     depends_on:
       db:
         condition: service_healthy
@@ -58,17 +45,10 @@ services:
       retries: 3
       start_period: 10s
 
-  # 前端
   frontend:
     build: ./frontend
     restart: unless-stopped
     environment:
       PORT: ${PORT}
-    # 删除ports
     depends_on:
       - backend
-
-# 数据卷全部注释
-# volumes:
-#   pgdata:
-#   redisdata:

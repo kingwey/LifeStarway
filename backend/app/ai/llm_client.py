@@ -4,27 +4,37 @@ import logging
 import random
 import time
 
-from openai import AsyncOpenAI, OpenAI
+from openai import AsyncOpenAI
 from app.config import settings
 
 logger = logging.getLogger("lifestarway.llm")
 
-# 根据配置自动推导 API Key、Base URL 和模型
-_api_key, _api_base, _model = settings.get_llm_config()
+# LLM 客户端懒加载：应用启动时不强制要求 API Key，
+# 只有真正调用 AI 功能时才初始化。未配置 key 时给出明确错误，
+# 不影响服务启动与其它非 AI 功能。
+_client: AsyncOpenAI | None = None
+_model: str | None = None
 
-client = AsyncOpenAI(
-    api_key=_api_key,
-    base_url=_api_base,
-    timeout=30.0,
-    max_retries=0,
-)
 
-sync_client = OpenAI(
-    api_key=_api_key,
-    base_url=_api_base,
-    timeout=30.0,
-    max_retries=0,
-)
+def _get_client() -> tuple[AsyncOpenAI, str]:
+    global _client, _model
+    if _client is None:
+        try:
+            api_key, api_base, model = settings.get_llm_config()
+        except ValueError as e:
+            raise RuntimeError(
+                f"AI 功能不可用：未配置 LLM API Key（{e}）。"
+                f"请在环境变量中设置对应的 API Key 后重试。"
+            )
+        _client = AsyncOpenAI(
+            api_key=api_key,
+            base_url=api_base,
+            timeout=30.0,
+            max_retries=0,
+        )
+        _model = model
+    return _client, _model
+
 
 LLM_RETRIES = 3
 LLM_BASE_DELAY = 1.0
@@ -78,6 +88,8 @@ async def call_llm(prompt: str, max_tokens: int = 4096, use_cache: bool = True) 
         except Exception:
             pass
 
+    client, model = _get_client()
+
     await _rate_limit_acquire()
     start = time.time()
     last_error = None
@@ -85,7 +97,7 @@ async def call_llm(prompt: str, max_tokens: int = 4096, use_cache: bool = True) 
     for attempt in range(1, LLM_RETRIES + 1):
         try:
             response = await client.chat.completions.create(
-                model=_model,
+                model=model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
@@ -97,7 +109,7 @@ async def call_llm(prompt: str, max_tokens: int = 4096, use_cache: bool = True) 
 
             duration = time.time() - start
             tokens = response.usage.total_tokens if response.usage else 0
-            logger.info(f"LLM调用成功 | 耗时: {duration:.2f}s | tokens: {tokens} | model: {_model}")
+            logger.info(f"LLM调用成功 | 耗时: {duration:.2f}s | tokens: {tokens} | model: {model}")
 
             if use_cache:
                 try:
